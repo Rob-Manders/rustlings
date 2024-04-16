@@ -15,11 +15,10 @@
 // Execute `rustlings hint hashmaps3` or use the `hint` watch subcommand for a
 // hint.
 
-// I AM NOT DONE
-
 use std::collections::HashMap;
 
 // A structure to store the goal details of a team.
+#[derive(Debug)]
 struct Team {
     goals_scored: u8,
     goals_conceded: u8,
@@ -41,27 +40,23 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         // goals scored by team_2 will be the number of goals conceded by
         // team_1.
 
-
+        update_scores(&mut scores, &team_1_name, Team { goals_scored: team_1_score, goals_conceded: team_2_score });
+        update_scores(&mut scores, &team_2_name, Team { goals_scored: team_2_score, goals_conceded: team_1_score });
     }
+
     scores
 }
 
-fn update_table(table: HashMap<String, Team>, team_name: String, team_score: u8, opponent_score: u8) -> HashMap<String, Team> {
-    let match_stats = Team {
-        goals_scored: team_score,
-        goals_conceded: opponent_score,
-    };
-
-    let mut scores = table;
-
-    for team in scores {
-        let stats = scores.entry(team).or_insert(match_stats);
-
-        stats.goals_scored += team_score;
-        stats.goals_conceded += opponent_score;
-    }
-
-    scores
+fn update_scores(scores: &mut HashMap<String, Team>, name: &str, team: Team) {
+    scores.entry(name.to_string())
+        .and_modify(|team_stats| {
+            team_stats.goals_scored += team.goals_scored;
+            team_stats.goals_conceded += team.goals_conceded
+        })
+        .or_insert(Team {
+            goals_scored: team.goals_scored,
+            goals_conceded: team.goals_conceded,
+        });
 }
 
 #[cfg(test)]
